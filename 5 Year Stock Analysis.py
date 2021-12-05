@@ -1,5 +1,5 @@
 """
-Created on Sunday October 28
+Created on Sunday November 28
 
 @author: Gustavo Bravo
 Next fix: want to eliminate the use of global data, as it will complicate future steps
@@ -63,8 +63,8 @@ def get_yearly_return_and_volatility(returns_dict, start_date, end_date):
 
 # Create a portfolio of the stocks blended at a certain weights of stocks
 # params: weights[], list of 4 weights that add up to 1
-#       cov, the covariance matrix of the 4 stocks
 #       returns_list{}, dictionary that includes the weights
+#       cov, the covariance matrix of the 4 stocks
 # returns: void
 def create_portfolio(weights, returns_list, cov_matrix):
     # Access global variables
@@ -147,7 +147,7 @@ def plot(names, returns, volatility, title):
 def main():
     # Get the data
     data = get_data(path="C:\\Users\\gusta\\Python\\Projects\\School\\Stock Data",
-                    names_path="C:\\Users\\gusta\\Python\\Projects\\School\\Stock Names\\A1_Names.csv")
+                    names_path="C:\\Users\\gusta\\Python\\Projects\\School\\Stock Names\\Names.csv")
 
     # Find the returns
     monthly_returns = yield_returns(data_dict=data)
