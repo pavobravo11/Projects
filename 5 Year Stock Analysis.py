@@ -2,18 +2,12 @@
 Created on Sunday November 28
 
 @author: Gustavo Bravo
-Next fix: want to eliminate the use of global data, as it will complicate future steps
 """
 
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import os
-
-# Create a list for the plots
-legend = []
-plot_returns = []
-plot_volatility = []
 
 
 # This function will get all the data found in the Adj Close Column for every file in the passed directory
@@ -66,12 +60,7 @@ def get_yearly_return_and_volatility(returns_dict, start_date, end_date):
 #       returns_list{}, dictionary that includes the weights
 #       cov, the covariance matrix of the 4 stocks
 # returns: void
-def create_portfolio(weights, returns_list, cov_matrix):
-    # Access global variables
-    global legend
-    global plot_returns
-    global plot_volatility
-
+def create_portfolio(weights, returns_list, cov_matrix, plot_returns, plot_volatility, legend):
     if round(weights.sum()) != 1:
         raise ValueError("Weights must add up to 1")
     c_matrix = cov_matrix.copy()
@@ -98,14 +87,20 @@ def create_portfolio(weights, returns_list, cov_matrix):
     name = ""
     legend.append(name.join(str(weights)))
 
+    return plot_returns, plot_volatility, legend
+
 
 # randomly generate n number of portfolios
-def generate_random_portfolios(n, returns, cov_matrix):
+def generate_random_portfolios(n, returns, cov_matrix, plot_returns, plot_volatility, legend):
     for i in range(n):
-        create_portfolio(
+        plot_returns, plot_volatility, legend = create_portfolio(
             weights=np.random.dirichlet(np.ones(4), size=1)[0],
             returns_list=returns,
-            cov_matrix=cov_matrix)
+            cov_matrix=cov_matrix,
+            plot_returns=plot_returns,
+            plot_volatility=plot_volatility,
+            legend=legend)
+    return plot_returns, plot_volatility, legend
 
 
 # This function creates the covariance matrix for a specified period of time from a dictionary
@@ -144,6 +139,33 @@ def plot(names, returns, volatility, title):
     fig.show()
 
 
+# This method is a parent method that find average returns and volatility of a stock and then generates
+# 15 randomly blended portfolios based on those dates of data
+def train_data(monthly_returns, start_date, end_date):
+    average_return, average_volatility = get_yearly_return_and_volatility(returns_dict=monthly_returns,
+                                                                          start_date=start_date,
+                                                                          end_date=end_date)
+    returns = list(average_return.values())
+    volatility = list(average_volatility.values())
+    legend = list(average_return)
+
+    cov_matrix = create_covariance_matrix(keys=list(monthly_returns),
+                                          values=list(monthly_returns.values()),
+                                          start_date=start_date,
+                                          end_date=end_date)
+
+    returns, volatility, legend = generate_random_portfolios(
+        n=15,
+        returns=list(average_return.values()),
+        cov_matrix=cov_matrix,
+        plot_returns=returns,
+        plot_volatility=volatility,
+        legend=legend
+    )
+
+    return returns, volatility, legend
+
+
 def main():
     # Get the data
     data = get_data(path="C:\\Users\\gusta\\Python\\Projects\\School\\Stock Data",
@@ -152,37 +174,16 @@ def main():
     # Find the returns
     monthly_returns = yield_returns(data_dict=data)
 
-    # Calculate yearly return and volatility
-    first_three_return, first_three_vol = get_yearly_return_and_volatility(returns_dict=monthly_returns,
-                                                                           start_date=0,
-                                                                           end_date=36)
-
-    # Access global variables to create lists for the first four stocks
-    global legend
-    global plot_returns
-    global plot_volatility
-    legend = list(first_three_return)
-    plot_returns = list(first_three_return.values())
-    plot_volatility = list(first_three_vol.values())
-
-    # Find the covariance matrix of these securities
-    keys_list = list(monthly_returns)
-    values_list = list(monthly_returns.values())
-    cov_matrix_13 = create_covariance_matrix(keys=keys_list,
-                                             values=values_list,
-                                             start_date=0,
-                                             end_date=36)
-
-    # Generate random portfolios of different blends
-    generate_random_portfolios(n=15,
-                               returns=list(first_three_return.values()),
-                               cov_matrix=cov_matrix_13)
+    returns13, volatility13, legend13 = train_data(monthly_returns=monthly_returns,
+                                                   start_date=0,
+                                                   end_date=36)
 
     # Plotly!!
-    plot(names=legend,
-         returns=plot_returns,
-         volatility=plot_volatility,
+    plot(names=legend13,
+         returns=returns13,
+         volatility=volatility13,
          title="2017 - 2019 Risk and Return")
 
 
-main()
+if __name__ == "__main__":
+    main()
