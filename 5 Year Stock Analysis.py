@@ -104,7 +104,7 @@ def generate_random_portfolios(n, returns, cov_matrix):
     for i in range(n):
         create_portfolio(
             weights=np.random.dirichlet(np.ones(4), size=1)[0],
-            returns_list=list(returns.values()),
+            returns_list=returns,
             cov_matrix=cov_matrix)
 
 
@@ -175,7 +175,7 @@ def main():
 
     # Generate random portfolios of different blends
     generate_random_portfolios(n=15,
-                               returns=first_three_return,
+                               returns=list(first_three_return.values()),
                                cov_matrix=cov_matrix_13)
 
     # Plotly!!
@@ -186,5 +186,3 @@ def main():
 
 
 main()
-
-
