@@ -58,7 +58,7 @@ def get_yearly_return_and_volatility(returns_dict, start_date, end_date):
 # Create a portfolio of the stocks blended at a certain weights of stocks
 # params: weights[], list of 4 weights that add up to 1
 #       returns_list{}, dictionary that includes the weights
-#       cov, the covariance matrix of the 4 stocks
+#       cov_matrix, the covariance matrix of the 4 stocks
 # returns: void
 def create_portfolio(weights, returns_list, cov_matrix, plot_returns, plot_volatility, legend):
     if round(weights.sum()) != 1:
@@ -75,10 +75,9 @@ def create_portfolio(weights, returns_list, cov_matrix, plot_returns, plot_volat
     plot_returns.append(expected_returns)
 
     # Calculate volatility for portfolio using the covariance matrix
-    for i in enumerate(c_matrix):
-        i = i[0]
-        c_matrix.loc[legend[i], :] *= weights[i]
-        c_matrix.loc[:, legend[i]] *= weights[i]
+    for idx, name in enumerate(c_matrix):
+        c_matrix.loc[name, :] *= weights[idx]
+        c_matrix.loc[:, name] *= weights[idx]
 
     # Add Volatility to global data
     plot_volatility.append(np.sqrt(c_matrix.sum().sum() * 12))
@@ -91,16 +90,16 @@ def create_portfolio(weights, returns_list, cov_matrix, plot_returns, plot_volat
 
 
 # randomly generate n number of portfolios
-def generate_random_portfolios(n, returns, cov_matrix, plot_returns, plot_volatility, legend):
+def generate_random_portfolios(n, returns, cov_matrix, returns_ledger, volatility_ledger, legend):
     for i in range(n):
-        plot_returns, plot_volatility, legend = create_portfolio(
+        returns_ledger, volatility_ledger, legend = create_portfolio(
             weights=np.random.dirichlet(np.ones(4), size=1)[0],
             returns_list=returns,
             cov_matrix=cov_matrix,
-            plot_returns=plot_returns,
-            plot_volatility=plot_volatility,
+            plot_returns=returns_ledger,
+            plot_volatility=volatility_ledger,
             legend=legend)
-    return plot_returns, plot_volatility, legend
+    return returns_ledger, volatility_ledger, legend
 
 
 # This function creates the covariance matrix for a specified period of time from a dictionary
@@ -139,7 +138,7 @@ def plot(names, returns, volatility, title):
     fig.show()
 
 
-# This method is a parent method that find average returns and volatility of a stock and then generates
+# This method is a parent method that finds average returns and volatility of a stock and then generates
 # 15 randomly blended portfolios based on those dates of data
 def train_data(monthly_returns, start_date, end_date):
     average_return, average_volatility = get_yearly_return_and_volatility(returns_dict=monthly_returns,
@@ -158,8 +157,8 @@ def train_data(monthly_returns, start_date, end_date):
         n=15,
         returns=list(average_return.values()),
         cov_matrix=cov_matrix,
-        plot_returns=returns,
-        plot_volatility=volatility,
+        returns_ledger=returns,
+        volatility_ledger=volatility,
         legend=legend
     )
 
