@@ -9,7 +9,6 @@ import numpy as np
 import plotly.express as px
 import os
 
-
 # This function will get all the data found in the Adj Close Column for every file in the passed directory
 # params: path = path of the folder in which you want the data from
 # returns: data_list[], all the data compiled onto one list
@@ -154,7 +153,7 @@ def train_data(monthly_returns, start_date, end_date):
                                           end_date=end_date)
 
     returns, volatility, legend = generate_random_portfolios(
-        n=15,
+        n=300,
         returns=list(average_return.values()),
         cov_matrix=cov_matrix,
         returns_ledger=returns,
@@ -182,7 +181,6 @@ def main():
          returns=returns13,
          volatility=volatility13,
          title="2017 - 2019 Risk and Return")
-
 
 if __name__ == "__main__":
     main()
