@@ -129,6 +129,7 @@ def plot(names, returns, volatility, title):
     fig.update_xaxes(range=[0, 1])
     fig.update_yaxes(range=[0, 1])
 
+    # Add tooltip
     fig.update_traces(marker=dict(size=15,
                                   line=dict(width=1,
                                             color='Black')),
@@ -137,15 +138,17 @@ def plot(names, returns, volatility, title):
     fig.show()
 
 
+# # This method creates the tooltip text for the given portfolio
+# def create_tooltip_text(name, returns, volatility):
+#     if name[0].isdigit():
+#
+
 # This method is a parent method that finds average returns and volatility of a stock and then generates
 # 15 randomly blended portfolios based on those dates of data
 def train_data(monthly_returns, start_date, end_date):
     average_return, average_volatility = get_yearly_return_and_volatility(returns_dict=monthly_returns,
                                                                           start_date=start_date,
                                                                           end_date=end_date)
-    returns = list(average_return.values())
-    volatility = list(average_volatility.values())
-    legend = list(average_return)
 
     cov_matrix = create_covariance_matrix(keys=list(monthly_returns),
                                           values=list(monthly_returns.values()),
@@ -156,15 +159,18 @@ def train_data(monthly_returns, start_date, end_date):
         n=300,
         returns=list(average_return.values()),
         cov_matrix=cov_matrix,
-        returns_ledger=returns,
-        volatility_ledger=volatility,
-        legend=legend
+        returns_ledger=list(average_return.values()),
+        volatility_ledger=list(average_volatility.values()),
+        legend=list(average_return)
     )
 
     return returns, volatility, legend
 
 
 def main():
+    # Set the seed value of np.random
+    np.random.seed(0)
+
     # Get the data
     data = get_data(path="C:\\Users\\gusta\\Python\\Projects\\School\\Stock Data",
                     names_path="C:\\Users\\gusta\\Python\\Projects\\School\\Stock Names\\Names.csv")
@@ -172,14 +178,14 @@ def main():
     # Find the returns
     monthly_returns = yield_returns(data_dict=data)
 
-    returns13, volatility13, legend13 = train_data(monthly_returns=monthly_returns,
-                                                   start_date=0,
-                                                   end_date=36)
+    returns1to3, volatility1to3, legend1to3 = train_data(monthly_returns=monthly_returns,
+                                                         start_date=0,
+                                                         end_date=36)
 
     # Plotly!!
-    plot(names=legend13,
-         returns=returns13,
-         volatility=volatility13,
+    plot(names=legend1to3,
+         returns=returns1to3,
+         volatility=volatility1to3,
          title="2017 - 2019 Risk and Return")
 
 if __name__ == "__main__":
