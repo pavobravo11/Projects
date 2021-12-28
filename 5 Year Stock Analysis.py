@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import os
-import plotly as p
 
 # This function will get all the data found in the Adj Close Column for every file in the passed directory
 # params: path = path of the folder in which you want the data from
