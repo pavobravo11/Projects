@@ -138,10 +138,10 @@ def plot(names, returns, volatility, title):
     fig.show()
 
 
-# # This method creates the tooltip text for the given portfolio
-# def create_tooltip_text(name, returns, volatility):
-#     if name[0].isdigit():
-#
+# This method creates the tooltip text for the given portfolio
+def create_tooltip_text(name, returns, volatility):
+    if name[0].isdigit():
+
 
 # This method is a parent method that finds average returns and volatility of a stock and then generates
 # 15 randomly blended portfolios based on those dates of data
